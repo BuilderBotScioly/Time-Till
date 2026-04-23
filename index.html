@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Time-Till</title>
+    <meta
+      name="description"
+      content="Track named countdowns with excluded weekdays and one-off excluded dates."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Flexible countdown workspace</p>
+          <h1>Count down to the dates that matter, minus the days that do not.</h1>
+          <p class="hero-text">
+            Build as many named countdowns as you want. Skip weekends, blackout
+            custom weekdays, add one-off dates like holidays, and keep
+            everything saved on this device.
+          </p>
+        </div>
+        <aside class="hero-note">
+          <p class="hero-note-label">How counting works</p>
+          <p>
+            Each countdown starts from today and counts only the included days
+            up to the target date.
+          </p>
+        </aside>
+      </header>
+
+      <main class="layout">
+        <section class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">Builder</p>
+              <h2 id="form-title">Create a countdown</h2>
+            </div>
+            <p class="panel-copy">
+              Give it a name, choose a target date, then decide which days
+              should not be counted.
+            </p>
+          </div>
+
+          <form id="countdown-form" novalidate>
+            <input type="hidden" id="countdown-id" />
+
+            <label class="field">
+              <span class="field-label">Countdown name</span>
+              <input
+                id="countdown-name"
+                name="countdown-name"
+                type="text"
+                placeholder="Semester ends"
+                maxlength="80"
+                required
+              />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Target date</span>
+              <input id="target-date" name="target-date" type="date" required />
+            </label>
+
+            <fieldset class="field fieldset">
+              <legend class="field-label">Recurring weekdays to exclude</legend>
+              <div class="weekday-grid">
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="1" />
+                  <span>Mon</span>
+                </label>
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="2" />
+                  <span>Tue</span>
+                </label>
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="3" />
+                  <span>Wed</span>
+                </label>
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="4" />
+                  <span>Thu</span>
+                </label>
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="5" />
+                  <span>Fri</span>
+                </label>
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="6" />
+                  <span>Sat</span>
+                </label>
+                <label class="weekday-option">
+                  <input class="weekday-checkbox" type="checkbox" value="0" />
+                  <span>Sun</span>
+                </label>
+              </div>
+              <p class="field-help">
+                Leave them all unchecked if you want to count every day.
+              </p>
+            </fieldset>
+
+            <div class="field">
+              <span class="field-label">Specific dates to exclude</span>
+              <div class="date-entry-row">
+                <input id="specific-date-input" type="date" />
+                <button id="add-specific-date" type="button" class="secondary-button">
+                  Add date
+                </button>
+              </div>
+              <div id="specific-date-list" class="chip-list" aria-live="polite"></div>
+              <p class="field-help">
+                Great for holidays, school breaks, travel dates, or any one-off
+                days you do not want counted.
+              </p>
+            </div>
+
+            <div class="form-actions">
+              <button id="submit-button" type="submit" class="primary-button">
+                Create countdown
+              </button>
+              <button id="cancel-edit" type="button" class="ghost-button" hidden>
+                Cancel edit
+              </button>
+            </div>
+
+            <p id="form-note" class="form-note">
+              Countdowns are saved locally in your browser on this device.
+            </p>
+          </form>
+        </section>
+
+        <section class="panel results-panel">
+          <div class="results-header">
+            <div>
+              <p class="panel-kicker">Dashboard</p>
+              <h2>Your countdowns</h2>
+            </div>
+            <button id="clear-all" type="button" class="ghost-button" hidden>
+              Delete all
+            </button>
+          </div>
+
+          <p id="results-summary" class="results-summary">
+            No countdowns yet. Create one to get started.
+          </p>
+
+          <div id="empty-state" class="empty-state">
+            <h3>Nothing on the clock yet</h3>
+            <p>
+              Add your first countdown to see included days remaining, calendar
+              gap, and your excluded-day rules in one place.
+            </p>
+          </div>
+
+          <div id="countdown-grid" class="countdown-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <noscript>
+      <div class="noscript-banner">
+        JavaScript is required for the countdown calculator to work.
+      </div>
+    </noscript>
+
+    <template id="countdown-card-template">
+      <article class="countdown-card">
+        <div class="card-top">
+          <p class="metric-label">Included days</p>
+          <div class="card-actions">
+            <button type="button" class="icon-button" data-action="edit">
+              Edit
+            </button>
+            <button type="button" class="icon-button danger" data-action="delete">
+              Delete
+            </button>
+          </div>
+        </div>
+        <h3 class="countdown-title"></h3>
+        <p class="metric-value"></p>
+        <p class="metric-caption"></p>
+
+        <div class="card-details">
+          <div class="detail-row">
+            <span>Target date</span>
+            <strong class="target-date"></strong>
+          </div>
+          <div class="detail-row">
+            <span>Calendar gap</span>
+            <strong class="calendar-gap"></strong>
+          </div>
+          <div class="detail-row">
+            <span>Excluded in range</span>
+            <strong class="excluded-range"></strong>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="summary-pill recurring-summary"></span>
+          <span class="summary-pill specific-summary"></span>
+        </div>
+
+        <p class="date-preview"></p>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
